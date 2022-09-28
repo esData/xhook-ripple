@@ -1,3 +1,3 @@
-# xhook-wasm-bind_account
+# ripple-bind_account
 
-XHook WebAssembily interface - Bind Account step
+Bind a specific account in WASM

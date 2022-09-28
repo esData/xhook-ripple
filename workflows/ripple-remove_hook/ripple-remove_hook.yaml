@@ -2,7 +2,7 @@
 name: ripple-remove_hook
 summary: Ripple remove hook
 description: This workflow simple remove hook
-url: https://github.com/esDataCo/tree/master/ripple-starter
+url: https://github.com/esDataCo/tree/master/ripple-remove_hook
 action_bound: both
 invokes:
   - ttPAYMENT

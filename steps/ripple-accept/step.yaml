@@ -6,6 +6,7 @@ summary: commit hook changes with a reason code
 tags:
   - accept
   - wasm
+  - final_src
 templates:
   ripple-accept:
     main: ripple-main.c.mustache

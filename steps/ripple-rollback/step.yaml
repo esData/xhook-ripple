@@ -6,6 +6,7 @@ summary: rollback/reject a transaction and prepare the WASM
 tags:
   - reject
   - wasm
+  - final_src
 templates:
   ripple-accept:
     main: ripple-main.c.mustache
@@ -15,4 +16,4 @@ parameters:
   reason:
     description: Reason or references code
     type: string
-    default: SUCCESS
+    default: REJECTED
