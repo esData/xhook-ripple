@@ -1,4 +1,4 @@
-# Ripple
+# ![Ripple](./images/icon.svg)Ripple
 
 This repository demostrate the xHookControl implementation on Ripple.
 

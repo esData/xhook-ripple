@@ -1,4 +1,4 @@
-name: bind_account
+name: ripple-bind_account
 type: step
 version: 1
 summary: continue only transactions was prepare/from hook account.
