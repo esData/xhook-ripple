@@ -1,0 +1,18 @@
+---
+name: ripple-rollback
+type: step
+version: 0.1.0
+summary: rollback/reject a transaction and prepare the WASM
+tags:
+  - reject
+  - wasm
+templates:
+  ripple-accept:
+    main: ripple-main.c.mustache
+    body:
+      - ripple-reject.c.mustache
+parameters:
+  reason:
+    description: Reason or references code
+    type: string
+    default: SUCCESS

@@ -1,0 +1,22 @@
+---
+name: ripple-set_hooks
+type: step
+version: 0.1.0
+summary: deploy hook to specific account, list up to 4 accounts.
+description: deploy hook to specific account, list up to 4 accounts.
+tags:
+  - set_hook
+  - fee
+parameters:
+  secret:
+    description: account secret
+    type: secret
+  accounts:
+    description: account id and secrets retreived from the vaults
+    type: array[string]
+    default: SUCCESS
+test:
+  - summary: unit test a single commit hook
+    type: task
+    parameters:
+      reason: UNIT_TEST

@@ -1,0 +1,14 @@
+/**
+ * {{comment}}
+ */
+#include <stdint.h>
+#include "hookapi.h"
+{{include_header}}
+{{cbak}}
+int64_t hook(uint32_t reserved ) {
+
+{{{body}}}
+
+  _g(1,1);
+  return 0;
+}

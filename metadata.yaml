@@ -1,0 +1,41 @@
+# integration slug. Required.
+name: ripple
+
+# The version of the integration. Required. This is an arbitrary text string
+# used to identify the bundle of actions for this release. Using dates or
+# incrementing integers is recommended. Each version replaces the one before it
+# on the specified release channel.
+#
+# As a convenience, this information may come from another text file or from a
+# Git tag (if applicable).
+version: 0.1.0
+
+# description of this integration. Required.
+summary: Ripple Hook implementation.
+
+# A paragraph or two describing what this integration does. Optional. Markdown.
+description: |
+  This resposity include steps and workflow to demostrate the BPM capabilities on XRP hook creation and operations in varias way.
+
+# Home intro URL to this integration's Website. Optional.
+home_url: https://github.com/esData/xhook-ripple
+
+# Source URL to this integration's Website. Optional.
+source_url: https://github.com/esData/xhook-ripple
+
+# Issue URL to this integration's Website. Optional.
+issues_url: https://github.com/esData/xhook-ripple/issues
+
+# Owner of this integration. Required.
+email: cheehuan@esdata.co
+
+# License information. Optional. If not specified, this integration is assumed
+# to be unlicensed proprietary code. Otherwise, must be a valid SPDX License
+# Expression (similar to npm) or an object referencing a license file.
+license: Apache-2.0
+
+# tags, Optional.
+tags:
+- integration
+- workflow
+- step

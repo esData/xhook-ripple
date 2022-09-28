@@ -1,0 +1,18 @@
+---
+name: ripple-remove_hook
+type: step
+version: 0.1.0
+summary: simple remove all the hooks on a account
+description: This step will simple remove hooks on a accounts
+tags:
+  - delete_hook
+  - fee
+parameters:
+  accounts:
+    description: account id and secrets retreived from the vaults
+    type: array[string]
+test:
+  - summary: unit test a single commit hook
+    type: task
+    parameters:
+      reason: UNIT_TEST

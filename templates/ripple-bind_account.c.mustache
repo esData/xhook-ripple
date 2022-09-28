@@ -1,0 +1,25 @@
+  // TODO: Bindaccount look at both bind_account and originating transaction account, to determine FROM or TO on the actions? Think of uses cases
+  TRACESTR("{{hookname}}-{{step}}-bindaccount: account: {{bind_account}}");
+  // this api fetches the AccountID of the account the hook currently executing is installed on
+  // since hooks can be triggered by both incoming and ougoing transactions this is important to know
+  unsigned char hook_accid[20];
+  hook_account((uint32_t)hook_accid, 20);
+
+  // next fetch the sfAccount field from the originating transaction
+  uint8_t account_field[20];
+  int32_t account_field_len = otxn_field(SBUF(account_field), sfAccount);
+  TRACEVAR(account_field_len);
+  if (account_field_len < 20)                                                             // negative values indicate errors from every api
+    rollback(SBUF("{{hookname}}-{{step}}-bindaccount: sfAccount field missing!!!"), 1);   // this code could never be hit in prod
+                                                                                          // but it's here for completeness
+
+  // compare the "From Account" (sfAccount) on the transaction with the account the hook is running on
+  int equal = 0; BUFFER_EQUAL(equal, hook_accid, account_field, 20);
+  if (!equal)
+  {
+    // if the accounts are not equal (memcmp != 0) the otxn was sent to the hook account by someone else
+    // accept() it and end the hook execution here
+    accept(SBUF("{{hookname}}-{{step}}-bindaccount: account: {{bind_account}}, "), 2);
+  }
+
+  // execution to here means the user has sent a valid transaction FROM the account the hook is installed on

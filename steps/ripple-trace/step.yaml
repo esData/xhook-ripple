@@ -1,0 +1,17 @@
+---
+name: ripple-trace
+type: step
+version: 0.1.0
+summary: add a trace message
+tags:
+  - trace
+  - wasm
+templates:
+  ripple-trace:
+    main: ripple-main.c.mustache
+    body:
+      - ripple-trace.c.mustache
+parameters:
+  message:
+    description: Trace message
+    type: string

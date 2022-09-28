@@ -1,0 +1,52 @@
+---
+name: ripple-start
+summary: Ripple starter
+description: This workflow allow both incoming and outcoming transaction.
+url: https://github.com/esDataCo/tree/master/ripple-starter
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - accept
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
+  secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
+  reason: XHOOLTRX01
+
+steps:
+  account_info_01:
+    step: ripple-account_info
+    block: true
+    ignore: false
+    parameters:
+      account: "$[parameters.account]"
+  trace_01:
+    step: ripple-trace
+    block: true
+    ignore: false
+    parameters:
+      message: 'Hello Ripple'
+  trace_02:
+    step: ripple-trace
+    block: true
+    ignore: false
+    parameters:
+      message: 'Hello Ripple again'
+  ripple-start:
+    step: ripple-accept
+    block: true
+    dependsOn: account_info_01
+    ignore: false
+    parameters:
+      reason: "$[parameters.reason]"
+  set_hook_test01:
+    step: ripple-set_hooks
+    block: true
+    dependsOn: accepts_01
+    status: disabled
+    parameters:
+      account_info: $[steps.account_info_01.result]

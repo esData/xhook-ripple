@@ -1,0 +1,49 @@
+  TRACESTR("{{hookname}}-{{step}}-split: account: {{split_account}}, amount: {{split_drop_to_send}}");
+
+  // before we start calling hook-api functions we should tell the hook how many tx we intend to create
+  etxn_reserve(1); // we are going to emit 1 transaction
+    
+  // hooks communicate accounts via the 20 byte account ID, this can be generated from an raddr like so
+  // a more efficient way to do this is precompute the account-id from the raddr (if the raddr never changes)
+  uint8_t carbon_accid[20];
+  int64_t ret = util_accid(
+          SBUF(carbon_accid),                                   /* <-- generate into this buffer  */
+          SBUF("{{split_account}}") );                          /* <-- from this r-addr           */
+  TRACEVAR(ret);
+
+  // fetch the sent Amount
+  // Amounts can be 384 bits or 64 bits. If the Amount is an XRP value it will be 64 bits.
+  unsigned char amount_buffer[48];
+  int64_t amount_len = otxn_field(SBUF(amount_buffer), sfAmount);
+  int64_t drops_to_send = {{split_drop_to_send}};
+
+  if (amount_len != 8)
+  {
+    // you can trace the behaviour of your hook using the trace(buf, size, as_hex) api
+    // which will output to xrpld's trace log
+    TRACESTR("Split: Non-xrp transaction detected, sending default {{split_drop_to_send}} drops to {{split_account}}");
+  } else {
+    TRACESTR("Split: XRP transaction detected, computing 1% to send to {{split_account}}");
+    int64_t otxn_drops = AMOUNT_TO_DROPS(amount_buffer);
+    TRACEVAR(otxn_drops);
+    if (otxn_drops > 100000)   // if its less we send the default amount. or if there was an error we send default
+      drops_to_send = (int64_t)((double)otxn_drops * 0.01f); // otherwise we send 1%
+  }
+
+  TRACEVAR(drops_to_send);
+
+  // create a buffer to write the emitted transaction into
+  unsigned char tx[PREPARE_PAYMENT_SIMPLE_SIZE];
+
+  // we will use an XRP payment macro, this will populate the buffer with a serialized binary transaction
+  // Parameter list: ( buf_out, drops_amount, to_address, dest_tag, src_tag )
+  PREPARE_PAYMENT_SIMPLE(tx, drops_to_send, carbon_accid, 0, 0);
+
+  // emit the transaction
+  uint8_t emithash[32];
+  int64_t emit_result = emit(SBUF(emithash), SBUF(tx));
+  TRACEVAR(emit_result);
+
+  // accept and allow the original transaction through
+  accept(SBUF("Split: Emitted transaction"), 0);
+  return 0;
