@@ -3,6 +3,7 @@ name: ripple-accept
 type: step
 version: 0.1.0
 summary: commit hook changes with a reason code
+description: Commit a transaction with a reference or reason code. This will generate the WASM output.  
 tags:
   - accept
   - wasm
