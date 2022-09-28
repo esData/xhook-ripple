@@ -3,7 +3,7 @@ name: ripple-rollback
 type: step
 version: 0.1.0
 summary: rollback/reject a transaction and prepare the WASM
-description: Rollback or revert a transaction. note: transaction charges still deducted from account.
+description: Rollback or revert a transaction. note transaction charges still deducted from account.
 tags:
   - reject
   - wasm
