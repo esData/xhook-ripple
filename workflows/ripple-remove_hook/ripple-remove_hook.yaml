@@ -19,11 +19,8 @@ parameters:
 steps:
   account_info_01:
     step: ripple-account_info
-    block: true
-    ignore: false
   remove_hook_01:
     step: ripple-remove_hook
-    block: true
-    ignore: false
+    dependsOn: account_info_01
     parameters:
-      account_info: $[steps.account_info_01.result]
+      account_info: $[steps.account_info_01.outputs.result]

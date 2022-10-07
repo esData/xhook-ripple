@@ -10,7 +10,7 @@ parameters:
   accounts:
     description: account id and secrets retreived from the vaults
     type: array[string]
-output:
+outputs:
   result:
     description: retreive account information
     type: json 

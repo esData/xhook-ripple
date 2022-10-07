@@ -8,15 +8,17 @@ tags:
   - set_hook
   - fee
 parameters:
+  account_info:
+    description: Account informations generated from account_info step.
+    type: json
+    dependsOnStep: ripple-address_info
+    dependsOnStepOutputs: result
   secret:
-    description: account secret
+    description: Account secret
     type: secret
-  accounts:
-    description: account id and secrets retreived from the vaults
-    type: array[string]
-    default: SUCCESS
-test:
-  - summary: unit test a single commit hook
-    type: task
-    parameters:
-      reason: UNIT_TEST
+    default: $[parameteres.secret]
+  account:
+    description: Account address
+    type: string
+    default: $[parameteres.account]
+    optional: true

@@ -251,6 +251,10 @@ class stepsHelper {
     final ? step['src_final'] = true : '';
     return step;
   }
+
+  setOutputs(step, output) {
+    step['outputs'] = output;
+  }
 }
 
 module.exports = stepsHelper
