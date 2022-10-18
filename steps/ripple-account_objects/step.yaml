@@ -1,11 +1,11 @@
 ---
-name: ripple-account_info
+name: ripple-account_objects
 type: step
 version: 0.1.0
 summary: get account information for decision
 description: Simple step to retrive account information for workflow parameters
 tags:
-  - account_info
+  - account_objects
 parameters:
   account:
     description: account id and secrets retreived from the vaults

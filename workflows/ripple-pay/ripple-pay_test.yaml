@@ -1,0 +1,24 @@
+---
+name: core-test
+summary: Playground
+description: Do anything
+uri: https://github.com/esDataCo/tree/master/co-test
+publish: private
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  account: rsgM2kcaxP8CyjXQp6B7n7vRZMb9zsM4cD
+  secret: snsrK5aBp3vhRTrvTtNDvtXGy3UQS
+
+steps:
+  account_info_01:
+    step: ripple-account_info
+    parameters:
+      account: "$[parameters.account]"
+  test01:
+    step: ripple-pay
+    dependsOn: account_info_01
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]
+      destination: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
+      amount: 100

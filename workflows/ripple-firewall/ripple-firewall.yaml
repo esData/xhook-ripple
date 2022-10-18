@@ -1,0 +1,45 @@
+---
+name: ripple-firewall
+summary: Ripple firewall
+description: This workflow will prepare firewall hook.
+uri: https://github.com/esDataCo/tree/master/ripple-firewall
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - firewall
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  secret: shnpmbX2evcaA8hdbSZCrfYmgcYBc
+
+steps:
+  trace_01:
+    step: ripple-trace
+    parameters:
+      message: 'Firewall: started'
+  firewall_01:
+    step: ripple-firewall
+    dependsOn: trace_01
+  rollback-01:
+    step: ripple-rollback
+    dependsOn: firewall_01
+    parameters:
+      reason: "Firewall: Blocking transaction from blacklisted account."
+  account_info_01:
+    step: ripple-account_info
+    dependsOn: rollback-01
+  set_hook_test01:
+    step: ripple-set_hooks
+    dependsOn: account_info_01
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]
+      hook_parameters:
+        - HookParameter:
+            HookParameterName: "blaccid"
+            HookParameterValue: "325FF3098E5D47FD71C49B7BE6EFED2B20849104"
+        - HookParameter:
+            HookParameterName: "blns"
+            HookParameterValue: "A0800997EB2FED3F3B33D86DE629F548449450ECF40530106224132D616061BE"

@@ -9,23 +9,23 @@ invokes:
   - ttACCOUNT_SET
 tags:
   - remove_hook
+  - remove_signers
 publish: public
 
 parameters:
   environment: hooks-testnet-v2.xrpl-labs.com
-  # traces_env: hooks-testnet-v2-debugstream.xrpl-labs.com
-  account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
-  secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
+  secret: spy64rAgyfuZ9Ds2R27ctKt2uyMeU
 
 steps:
   account_info_01:
     step: ripple-account_info
-  account_objects_01:
-    step: ripple-account_objects
+  remove_signer_01:
+    step: ripple-remove_signers
     dependsOn: account_info_01
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]   
   remove_hook_01:
     step: ripple-remove_hook
-    dependsOn: account_objects_01
-    skip: ?[$[steps.account_objects_01.outputs] == empty]
+    dependsOn: remove_signer_01
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_seq: ?[$[steps.account_info_01.outputs.Sequence] + 1]

@@ -1,0 +1,27 @@
+---
+name: ripple-notary_proposer
+summary: Ripple notary proposer
+description: This workflow will prepare multi-sign transaction hook.
+uri: https://github.com/esDataCo/tree/master/ripple-notary
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - notary
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  notary_account: rQ9sex1wMJVmiHD757xA1Ja92XGyVygjzB
+  secret: shntYg9uhfk39xniaFL58H95sDQ4c
+
+steps:
+  account_info_01:
+    step: ripple-account_info
+  notary_proposer_01:
+    step: ripple-notary_proposer
+    dependsOn: account_info_01
+    parameters:
+      account_seq: "$[steps.account_info_01.outputs.Sequence]"
+      proposed_amount: 990000

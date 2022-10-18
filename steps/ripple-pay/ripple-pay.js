@@ -27,7 +27,35 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
   const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
   await client.connect();
 
-  var txn = stepsHelper.prepare_sethook_txn(account, stepName, '', +step.parameters.account_seq);
+  var txn = {
+    Account: account,
+    TransactionType: 'Payment',
+    Amount: ''+step.parameters.amount,
+    Destination: step.parameters.destination,
+    SigningPubKey: '',
+    Sequence: step.parameters.account_seq,
+    Fee: '0'
+  };
+
+  if ( step.parameters.destination_tag ) {
+    txn['DestinationTag'] = step.parameters.destination_tag;
+  }
+
+  if ( step.parameters.invoice_id ) {
+    txn['InvoiceID'] = step.parameters.invoice_id;
+  }
+
+  if ( step.parameters.send_max ) {
+    txn['SendMax'] = step.parameters.send_max;
+  }
+
+  if ( step.parameters.deliver_min ) {
+    txn['DeliverMin'] = step.parameters.deliver_min;
+  }
+
+  if ( step.parameters.paths ) {
+    txn['Paths'] = step.parameters.paths;
+  }
 
   try {
     var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));

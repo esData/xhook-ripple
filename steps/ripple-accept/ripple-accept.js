@@ -1,6 +1,6 @@
 const shelper = require("../../_helpers/steps_helper");
 const stepsHelper = new shelper(__dirname);
-const metadata = stepsHelper.metadata
+const metadata = stepsHelper.metadata;
 
 /* ripple-accept
  * **SUMMARY:** Step to accept/commit a transaction and prepare a hook WASM

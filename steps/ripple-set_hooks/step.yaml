@@ -8,11 +8,11 @@ tags:
   - set_hook
   - fee
 parameters:
-  account_info:
-    description: Account informations generated from account_info step.
-    type: json
+  account_seq:
+    description: Account sequence.
+    type: integer
     dependsOnStep: ripple-address_info
-    dependsOnStepOutputs: result
+    dependsOnStepOutputs: Sequence
   secret:
     description: Account secret
     type: secret
@@ -22,3 +22,11 @@ parameters:
     type: string
     default: $[parameteres.account]
     optional: true
+  hook_parameters:
+    description: Hook parameters to be setup. field must contain HookParameter, HookParameterName and HookParameterValue.
+    type: array[json]
+    optional: true
+    # example
+    #    - HookParameter:
+    #        HookParameterName: "key1"
+    #        HookParameterValue: "1234523445"

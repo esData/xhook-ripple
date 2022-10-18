@@ -1,0 +1,39 @@
+---
+name: ripple-blacklist
+summary: Ripple blacklist
+description: This workflow will prepare blacklist hook.
+uri: https://github.com/esDataCo/tree/master/ripple-blacklist
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - blacklist
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  secret: shntYg9uhfk39xniaFL58H95sDQ4c
+
+steps:
+  memo_zero_accept_01:
+    step: ripple-memo_zero_accept
+    parameters:
+      message: "Blacklist: non-memo incoming transaction, do nothing!"
+  blacklist_01:
+    step: ripple-blacklist
+    dependsOn: memo_zero_accept_01
+  accept-01:
+    step: ripple-accept
+    dependsOn: blacklist_01
+    parameters:
+      reason: "Blacklist: completed."
+  account_info_01:
+    step: ripple-account_info
+    dependsOn: accept-01
+  set_hook_test01:
+    step: ripple-set_hooks
+    dependsOn: account_info_01
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]
+      namespace: ripple-backlist

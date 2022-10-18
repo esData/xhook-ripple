@@ -1,0 +1,48 @@
+---
+name: ripple-carbon
+summary: Ripple carbon
+description: This workflow will prepare a split certain percentage of inbound tansactions to seperate account.
+uri: https://github.com/esDataCo/tree/master/ripple-carbon
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - carbon
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
+  secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
+  skip_set_hook: false
+
+steps:
+  trace_01:
+    step: ripple-trace
+    parameters:
+      message: 'Carbon: started'
+  emit_01:
+    step: ripple-emit_by_pct
+    dependsOn: trace_info
+    parameters:
+      emitted_account: rfCarbonVNTuXckX6x2qTMFmFSnm6dEWGX
+      origin_txn_drops_pct: 2
+      min_drops_emitted: 1000
+  accept_01:
+    step: ripple-accept
+    dependsOn: emit_01
+    parameters:
+      reason: "Carbon: Emitted transaction"
+  account_info_01:
+    step: ripple-account_info
+    dependsOn: accept_01
+    skip: $[parameters.skip_set_hook]
+    parameters:
+      account: "$[parameters.account]"
+  set_hooks_01:
+    step: ripple-set_hooks
+    dependsOn: account_info_01
+    skip: $[parameters.skip_set_hook]
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]

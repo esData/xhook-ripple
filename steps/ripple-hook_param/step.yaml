@@ -1,0 +1,20 @@
+---
+name: ripple-hook_param
+type: step
+version: 0.1.0
+summary: Hook param implementation
+tags:
+  - hook_param
+  - wasm
+templates:
+  ripple-trace:
+    main: ripple-main.c.mustache
+    body:
+      - ripple-hook_param.c.mustache
+parameters:
+  param_field:
+    description: Source param field
+    type: string
+  param_name:
+    description: Parameter name
+    type: string

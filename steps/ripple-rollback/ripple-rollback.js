@@ -23,17 +23,14 @@ module.exports = function (workflowId, stepName, step, log, callback) {
         // Decode base64 encoded wasm that is coming back from the endpoint
         // const {readWasm} = require('wabt');
         // const wast_output = readWasm(new Uint8Array(decodeBinary(data.output)));
-        step['wasm'] = {  message: data.message, 
-                          output: data.output,
-                          // wast_output: wast_output
-                        }
+        step['wasm'] = data.output
       } else {
         step.status = 'error';
         step.message = `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${data.message}.`;
       }
       // log.debug(`[${workflowId}] [${stepName}]: data=[${JSON.stringify(step)}].`);
       // log.debug(`[${workflowId}] [${stepName}]: wasm=[${data.output}]`)
-      callback(step);
+      callback(stepsHelper.setSource(step, src, true));
     })
     .catch((error) => { 
       step.status = 'error';

@@ -1,0 +1,54 @@
+---
+name: ripple-pay
+type: step
+version: 0.1.0
+summary: Make ripple payment
+description: Generate ripple payment transaction
+tags:
+  - payment
+  - fee
+parameters:
+  account_seq:
+    description: Account sequence
+    type: integer
+    dependsOnStep: ripple-address_info
+    dependsOnStepOutputs: Sequence
+  secret:
+    description: Account secret
+    type: secret
+    default: $[parameteres.secret]
+  account:
+    description: Account address
+    type: string
+    default: $[parameteres.account]
+    optional: true
+  destination:
+    description: Target payment account
+    type: string
+  destination_tag:
+    description: Target payment destination tag
+    type: string
+    optional: true
+  invoice_id:
+    description: Invoice Id
+    type: string
+    optional: true
+  send_max:
+    description: Send max amount
+    type: integer
+    optional: true
+  deliver_min:
+    description: Delivery Min amount
+    type: integer
+    optional: true
+  amount:
+    description: Payment amount 
+    type: float
+  paths:
+    description: Payment paths 
+    type: string
+    optional: true
+  mock:
+    description: mock Payment
+    type: boolean
+    default: false

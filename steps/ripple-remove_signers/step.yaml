@@ -1,18 +1,17 @@
 ---
-name: ripple-remove_hook
+name: ripple-remove_signers
 type: step
 version: 0.1.0
-summary: simple remove all the hooks on a account
-description: This step will simple remove hooks on a accounts
+summary: remove signer list
+description: This step will remove the signer list on a accounts
 tags:
-  - remove_hook
-  - fee
+  - remove_signers
 parameters:
   account_seq:
-    description: Account sequence
+    description: Account informations generated from account_info step.
     type: integer
-    dependsOnStep: ripple-account_info
-    dependsOnStepOutputs: Sequence
+    dependsOnStep: ripple-address_info
+    dependsOnStepOutputs: result
   secret:
     description: Account secret
     type: secret

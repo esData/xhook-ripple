@@ -2,7 +2,7 @@
 name: ripple-starter
 summary: Ripple starter
 description: This workflow allow both incoming and outcoming transaction.
-url: https://github.com/esDataCo/tree/master/ripple-starter
+uri: https://github.com/esDataCo/tree/master/ripple-starter
 action_bound: both
 invokes:
   - ttPAYMENT
@@ -11,35 +11,47 @@ tags:
   - accept
 publish: public
 
+triggers:
+  daily_run:
+    scheduled: true
+    trigger: system-cron
+    parameters:
+      schedule: '0 * * * *'
+  accounts_feed_run:
+    scheduled: false
+    trigger: fb-watchman
+    parameters:
+      dir_interest: 'accounts_feed'
+    map_content: exact
+
 parameters:
   environment: hooks-testnet-v2.xrpl-labs.com
   account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
   secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
-  reason: XHOOLTRX01
+  reason: "Starter: completed"
 
 steps:
-  account_info_01:
-    step: ripple-account_info
-    parameters:
-      account: "$[parameters.account]"
   trace_01:
     step: ripple-trace
-    dependsOn: account_info_01
     parameters:
-      message: 'Hello Ripple'
-  trace_02:
-    step: ripple-trace
+      message: 'Starter: started'
+  accept-01:
+    step: ripple-accept
     dependsOn: trace_01
     parameters:
-      message: 'Hello Ripple again'
-  accepts_01:
-    step: ripple-accept
-    dependsOn: trace_02
-    parameters:
       reason: "$[parameters.reason]"
+  account_info_01:
+    step: ripple-account_info
+    dependsOn: accept-01
+    parameters:
+      account: "$[parameters.account]"
   set_hook_test01:
     step: ripple-set_hooks
-    dependsOn: accepts_01
-    status: disabled
+    dependsOn: account_info_01
+    # status: disabled
     parameters:
-      account_info: $[steps.account_info_01.result]
+      account_seq: $[steps.account_info_01.outputs.Sequence]
+      hook_parameters:
+        - HookParameter:
+            HookParameterName: "key1"
+            HookParameterValue: "1234523445"

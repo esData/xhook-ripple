@@ -3,7 +3,6 @@ name: ripple-trace
 type: step
 version: 0.1.0
 summary: add a trace message
-description: Add a trace code in Hook
 tags:
   - trace
   - wasm

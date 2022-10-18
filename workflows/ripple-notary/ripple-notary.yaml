@@ -1,0 +1,57 @@
+---
+name: ripple-notary
+summary: Ripple notary
+description: This workflow will prepare multi-sign transaction hook.
+uri: https://github.com/esDataCo/tree/master/ripple-notary
+action_bound: both
+invokes:
+  - ttPAYMENT
+  - ttACCOUNT_SET
+tags:
+  - notary
+publish: public
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+  account: rQ9sex1wMJVmiHD757xA1Ja92XGyVygjzB
+  secret: spy64rAgyfuZ9Ds2R27ctKt2uyMeU
+  skip_set_hook: false
+
+steps:
+  trace_01:
+    step: ripple-trace
+    parameters:
+      message: 'Notary: started'
+  notary_01:
+    step: ripple-notary
+    dependsOn: trace_info
+  accept_01:
+    step: ripple-accept
+    dependsOn: multi_sign_01
+    parameters:
+      reason: "Notary: Emitted multisigned transaction"
+  account_info_01:
+    step: ripple-account_info
+    dependsOn: accept_01
+    skip: $[parameters.skip_set_hook]
+    parameters:
+      account: "$[parameters.account]"
+  set_hook_01:
+    step: ripple-set_hooks
+    dependsOn: account_info_01
+    skip: $[parameters.skip_set_hook]
+    parameters:
+      account_seq: $[steps.account_info_01.outputs.Sequence]
+  set_signers_01:
+    step: ripple-set_signers
+    dependsOn: set_hook_01
+    skip: $[parameters.skip_set_hook]
+    parameters:
+      account_seq: "?[$[steps.account_info_01.outputs.Sequence] + 1]"
+      signers:
+        - SignerEntry:
+            Account: rnbMjGgfwzhUz35nb2pEgGZnUMTJQfHMrY
+            SignerWeight: 2
+        - SignerEntry:
+            Account: rhctVkmq8zKpv7wcJzmM74E77ktV1GgTTz
+            SignerWeight: 2

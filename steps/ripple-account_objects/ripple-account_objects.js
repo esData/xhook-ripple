@@ -2,13 +2,13 @@ const shelper = require("../../_helpers/steps_helper");
 const stepsHelper = new shelper(__dirname);
 
 /* ripple-account_info
- * **SUMMARY:** collect account information.
+ * **SUMMARY:** collect account objects.
  * 
  * **PARAMETERS:**
- * @param account_info Account information to obtain the latest sequence number
+ * @param account_info Account objects to obtain the latest sequence number
  * @param secret Account secret
   * **OUTPUT:**
- * @param result Account informations.
+ * @param result Account objects.
  */
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
@@ -24,16 +24,16 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
     stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
   }
 
-  const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
-  await client.connect();
+  const client = new xrpljs.Client(`wss://${step.parameters.environment}`)
+  await client.connect()
   try {
     const response = await client.request({
-      "command": "account_info",
+      "command": "account_objects",
       "account": account,
       "ledger_index": "validated",
       "id" : workflowId
-    });
-    stepsHelper.setOutputs(step, { ...response.result.account_data });
+    })
+    stepsHelper.setOutputs(step, response.result.account_objects);
   } catch(e) { 
     step.status = 'error';
     step.message = `${workflowId}@${stepName}: ${stepsHelper.metadata.name}@${stepsHelper.metadata.version}, ${e.message}.`

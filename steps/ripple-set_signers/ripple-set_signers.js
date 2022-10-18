@@ -2,12 +2,13 @@ const shelper = require("../../_helpers/steps_helper");
 const stepsHelper = new shelper(__dirname);
 const metadata = stepsHelper.metadata
 
-/* ripple-remove_hooks
- * **SUMMARY:** remove deployed hook from accounts
+/* ripple-set_signers
+ * **SUMMARY:** Setup signer list
  * 
  * **PARAMETERS:**
  * @param account_seq Account information to obtain the latest sequence number
  * @param secret Account secret
+ * @param signers Signer list
  */
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
@@ -27,7 +28,16 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
   const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
   await client.connect();
 
-  var txn = stepsHelper.prepare_sethook_txn(account, stepName, '', +step.parameters.account_seq);
+  var txn = {
+    Flags: 0,
+    TransactionType: "SignerListSet",
+    Account: account,
+    SignerQuorum: step.parameters.signers.length,
+    SignerEntries: step.parameters.signers,
+    Sequence: +step.parameters.account_seq,
+    SigningPubKey: '',
+    Fee: "0" 
+  };
 
   try {
     var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));

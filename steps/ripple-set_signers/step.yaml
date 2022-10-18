@@ -1,0 +1,31 @@
+---
+name: ripple-set_signers
+type: step
+version: 0.1.0
+summary: setup signer list
+description: This step will prepare the signer list on a accounts
+tags:
+  - set_signers
+  - fee
+parameters:
+  account_seq:
+    description: Account informations generated from account_info step.
+    type: integer
+    dependsOnStep: ripple-address_info
+    dependsOnStepOutputs: result
+  secret:
+    description: Account secret
+    type: secret
+    default: $[parameteres.secret]
+  account:
+    description: Account address
+    type: string
+    default: $[parameteres.account]
+    optional: true
+  signers:
+    - SignerEntry:
+        Account: rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW
+        SignerWeight: 2
+    - SignerEntry:
+        Account: rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW
+        SignerWeight: 2
