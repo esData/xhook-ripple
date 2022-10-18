@@ -24,10 +24,10 @@ steps:
       message: 'Notary: started'
   notary_01:
     step: ripple-notary
-    dependsOn: trace_info
+    dependsOn: trace_01
   accept_01:
     step: ripple-accept
-    dependsOn: multi_sign_01
+    dependsOn: notary_01
     parameters:
       reason: "Notary: Emitted multisigned transaction"
   account_info_01:

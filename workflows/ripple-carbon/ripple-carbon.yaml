@@ -24,7 +24,7 @@ steps:
       message: 'Carbon: started'
   emit_01:
     step: ripple-emit_by_pct
-    dependsOn: trace_info
+    dependsOn: trace_01
     parameters:
       emitted_account: rfCarbonVNTuXckX6x2qTMFmFSnm6dEWGX
       origin_txn_drops_pct: 2
