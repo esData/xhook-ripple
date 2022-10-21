@@ -2,6 +2,7 @@ const yaml = require("js-yaml");
 const fs = require("fs");
 const mustache = require("mustache");
 const crypto = require("crypto");
+const xrpljs = require("xrpl-hooks");
 
 class stepsHelper {
   constructor(stepdir) {
@@ -372,6 +373,14 @@ class stepsHelper {
       }
     });
     return missing;
+  }
+
+  validate_secret_account(secret) {
+    try {
+      return xrpljs.Wallet.fromSeed(secret).classicAddress;
+    } catch {
+      return undefined;
+    }
   }
 }
 

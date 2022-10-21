@@ -16,55 +16,56 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
   var missing_params = stepsHelper.validate_params(step.parameters);
   if (missing_params.length > 0) {
     stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
-    callback(step);
   } else if (!step.parameters.wasm) {
     stepsHelper.setError(step, `${workflowId}@${stepName}: No prepared template, ensure accept/rollback step included.`);
-    callback(step);
   } else {
-    // Enable account debug traces
-    if ( step.parameters.traces_env ) {
-      const accounts = step.parameters.accounts ? step.parameters.accounts : [];
-      if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
-        accounts.push(step.parameters.account);
+    const account = stepsHelper.validate_secret_account(step.parameters.secret);
+    if ( !account ) {
+      stepsHelper.setError(step, `${workflowId}@${stepName}: invliad secret.`);
+    } else {
+      // Enable account debug traces
+      if ( step.parameters.traces_env ) {
+        const accounts = step.parameters.accounts ? step.parameters.accounts : [];
+        if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
+          accounts.push(step.parameters.account);
+        }
+        stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
       }
-      stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
-    }
-    
-    const zlib = require('zlib');
-    const wasm_bytes = stepsHelper.decodeRestrictedBase64ToBytes(step.parameters.wasm);
-    const wasm_inflat = zlib.inflateSync(wasm_bytes);
-    const xrpljs = require("xrpl-hooks");
+      
+      const zlib = require('zlib');
+      const wasm_bytes = stepsHelper.decodeRestrictedBase64ToBytes(step.parameters.wasm);
+      const wasm_inflat = zlib.inflateSync(wasm_bytes);
+      const xrpljs = require("xrpl-hooks");
+ 
+      const namespace = step.parameters.namespace || stepName;
+      var hookon = "0000000000000000";
+      var hook_params = step.parameters.hook_parameters || [];
+      var txn = stepsHelper.prepare_sethook_txn(account,
+                                                namespace,
+                                                wasm_inflat,
+                                                step.parameters.account_sequence,
+                                                hookon,
+                                                hook_params
+                                                );
 
-    const account = xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress;
-    const namespace = step.parameters.namespace || stepName;
+      try {
+        const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
+        await client.connect();
+        var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
+      
+        delete txn["SigningPubKey"];
+        txn.Fee = response.result?.drops?.base_fee || "10";
 
-    var hookon = "0000000000000000";
-    var hook_params = step.parameters.hook_parameters || [];
-    var txn = stepsHelper.prepare_sethook_txn(account,
-                                              namespace,
-                                              wasm_inflat,
-                                              step.parameters.account_sequence,
-                                              hookon,
-                                              hook_params
-                                              );
-
-    try {
-      const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
-      await client.connect();
-      var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
-    
-      delete txn["SigningPubKey"];
-      txn.Fee = response.result?.drops?.base_fee || "10";
-
-      var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(step.parameters.secret) })
-      if ( response.result.applied !== true || response.result.engine_result != 'tesSUCCESS' ) {
-        stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${response.result.engine_result_message}.`);
+        var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(step.parameters.secret) })
+        if ( response.result.applied !== true || response.result.engine_result != 'tesSUCCESS' ) {
+          stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${response.result.engine_result_message}.`);
+        }
+        stepsHelper.setOutputs(step, { 'result' : response.result} );
+        client.disconnect();
+      } catch(e) {
+        stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`);
       }
-      stepsHelper.setOutputs(step, { 'result' : response.result} );
-      client.disconnect();
-    } catch(e) {
-      stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`);
     }
-    callback(step);
   }
+  callback(step);
 };

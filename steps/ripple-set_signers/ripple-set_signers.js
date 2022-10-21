@@ -18,47 +18,49 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
   var missing_params = stepsHelper.validate_params(step.parameters);
   if (missing_params.length > 0) {
     stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
-    callback(step);
   } else {
-    const account = xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress;
-
-    // Enable account debug traces
-    if ( step.parameters.traces_env ) {
-      const accounts = step.parameters.accounts ? step.parameters.accounts : [];
-      if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
-        accounts.push(step.parameters.account);
+    const account = stepsHelper.validate_secret_account(step.parameters.secret);
+    if ( !account ) {
+      stepsHelper.setError(step, `${workflowId}@${stepName}: invliad secret.`);
+    } else {
+      // Enable account debug traces
+      if ( step.parameters.traces_env ) {
+        const accounts = step.parameters.accounts ? step.parameters.accounts : [];
+        if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
+          accounts.push(step.parameters.account);
+        }
+        stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
       }
-      stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
-    }
 
-    var txn = {
-      Flags: 0,
-      TransactionType: "SignerListSet",
-      Account: account,
-      SignerQuorum: step.parameters.signers.length,
-      SignerEntries: step.parameters.signers,
-      Sequence: +step.parameters.account_sequence,
-      SigningPubKey: '',
-      Fee: "0" 
-    };
+      var txn = {
+        Flags: 0,
+        TransactionType: "SignerListSet",
+        Account: account,
+        SignerQuorum: step.parameters.signers.length,
+        SignerEntries: step.parameters.signers,
+        Sequence: +step.parameters.account_sequence,
+        SigningPubKey: '',
+        Fee: "0" 
+      };
 
-    try {
-      const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
-      await client.connect();
-      var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
-    
-      delete txn["SigningPubKey"];
-      txn.Fee = response.result?.drops?.base_fee || "10";
+      try {
+        const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
+        await client.connect();
+        var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
+      
+        delete txn["SigningPubKey"];
+        txn.Fee = response.result?.drops?.base_fee || "10";
 
-      var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(step.parameters.secret) })
-      if ( response.result.applied !== true || response.result.engine_result != 'tesSUCCESS' ) {
-        stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${response.result.engine_result_message}.`);
+        var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(step.parameters.secret) })
+        if ( response.result.applied !== true || response.result.engine_result != 'tesSUCCESS' ) {
+          stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${response.result.engine_result_message}.`);
+        }
+        stepsHelper.setOutputs(step, { 'result' : response.result} );
+        client.disconnect();
+      } catch(e) {
+        stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`);
       }
-      stepsHelper.setOutputs(step, { 'result' : response.result} );
-      client.disconnect();
-    } catch(e) {
-      stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`);
     }
-    callback(step);
   }
+  callback(step);
 };

@@ -20,9 +20,9 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
     stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
   } else {
     // Derive from secret, if account not specified
-    const account = step.parameters.secret ? xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress : step.parameters.account;
+    const account = step.parameters.secret ? stepsHelper.validate_secret_account(step.parameters.secret) : step.parameters.account;
     if ( !account ) {
-      stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters account.`);
+      stepsHelper.setError(step, `${workflowId}@${stepName}: missing account or invliad secret.`);
     } else {
       // Enable account debug traces
       if ( step.parameters.traces_env ) {
@@ -49,6 +49,5 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
       }
     }
   }
-
   callback(step);
 };
