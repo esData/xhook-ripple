@@ -1,0 +1,11 @@
+---
+name: core-http_request
+version: 0.1.0
+summary: call a http request
+description: Trigger a http request to obtain information from a end-point.
+tags:
+  - http_request
+parameters:
+  options:
+    description: The options object used by the request module
+    type: json

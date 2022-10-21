@@ -41,13 +41,13 @@ steps:
     dependsOn: account_info_01
     skip: $[parameters.skip_set_hook]
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]
   set_signers_01:
     step: ripple-set_signers
     dependsOn: set_hook_01
     skip: $[parameters.skip_set_hook]
     parameters:
-      account_seq: "?[$[steps.account_info_01.outputs.Sequence] + 1]"
+      account_sequence: "?[$[steps.account_info_01.outputs.Sequence] + 1]"
       signers:
         - SignerEntry:
             Account: rnbMjGgfwzhUz35nb2pEgGZnUMTJQfHMrY

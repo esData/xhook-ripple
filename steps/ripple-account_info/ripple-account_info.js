@@ -13,32 +13,41 @@ const stepsHelper = new shelper(__dirname);
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
   const xrpljs = require("xrpl-hooks");
-  const account = step.parameters.secret ? xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress : step.parameters.account;
 
-  // Enable account debug traces
-  if ( step.parameters.traces_env ) {
-    const accounts = step.parameters.accounts ? step.parameters.accounts : [];
-    if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
-      accounts.push(step.parameters.account);
+  // Validate parameters based on metadata
+  var missing_params = stepsHelper.validate_params(step.parameters);
+  if (missing_params.length > 0) {
+    stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
+  } else {
+    // Derive from secret, if account not specified
+    const account = step.parameters.secret ? xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress : step.parameters.account;
+    if ( !account ) {
+      stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters account.`);
+    } else {
+      // Enable account debug traces
+      if ( step.parameters.traces_env ) {
+        const accounts = step.parameters.accounts ? step.parameters.accounts : [];
+        if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
+          accounts.push(step.parameters.account);
+        }
+        stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
+      }
+
+      try {
+        const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
+        await client.connect();
+        const response = await client.request({
+          "command": "account_info",
+          "account": account,
+          "ledger_index": "validated",
+          "id" : workflowId
+        });
+        stepsHelper.setOutputs(step, response.result.account_data);
+        client.disconnect();
+      } catch(e) {
+        stepsHelper.setError(step, `${workflowId}@${stepName}: ${stepsHelper.metadata.name}@${stepsHelper.metadata.version}, ${e.message}.`);
+      }
     }
-    stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
   }
-
-  const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
-  await client.connect();
-  try {
-    const response = await client.request({
-      "command": "account_info",
-      "account": account,
-      "ledger_index": "validated",
-      "id" : workflowId
-    });
-    stepsHelper.setOutputs(step, { ...response.result.account_data });
-  } catch(e) { 
-    step.status = 'error';
-    step.message = `${workflowId}@${stepName}: ${stepsHelper.metadata.name}@${stepsHelper.metadata.version}, ${e.message}.`
-  }
-  
-  client.disconnect()
   callback(step);
 };

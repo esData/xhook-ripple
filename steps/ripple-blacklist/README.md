@@ -1,0 +1,3 @@
+# ripple-account_blacklist
+
+Simple step to retrive showcase blacklist hook implementation. WIP...

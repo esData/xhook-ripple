@@ -1,0 +1,9 @@
+---
+name: internal-acctrc_to_db
+version: 0.1.0
+summary: load internal account debug traces to persistence store
+description: Internal step to load account debug traces when enabled and save file store result to db store.
+tags:
+  - internal
+  - account debug trace
+  - file to db

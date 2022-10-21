@@ -1,11 +1,10 @@
 ---
 name: ripple-trace
-type: step
 version: 0.1.0
 summary: add a trace message
 tags:
-  - trace
-  - wasm
+  - xrpl_hook_trace
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache

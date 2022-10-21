@@ -1,31 +1,27 @@
 ---
 name: ripple-set_signers
-type: step
 version: 0.1.0
-summary: setup signer list
-description: This step will prepare the signer list on a accounts
+summary: Setup account signers
+description: This step will setup the signers on a accounts
 tags:
-  - set_signers
-  - fee
+  - xrpl_set_signers
 parameters:
-  account_seq:
-    description: Account informations generated from account_info step.
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
+  account_sequence:
+    description: Account sequence
     type: integer
-    dependsOnStep: ripple-address_info
-    dependsOnStepOutputs: result
+    dependsOnStep: ripple-account_info
+    dependsOnStepOutputs: Sequence
   secret:
     description: Account secret
     type: secret
-    default: $[parameteres.secret]
-  account:
-    description: Account address
-    type: string
-    default: $[parameteres.account]
-    optional: true
   signers:
-    - SignerEntry:
-        Account: rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW
-        SignerWeight: 2
-    - SignerEntry:
-        Account: rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW
-        SignerWeight: 2
+    description: Signers object
+    type: json

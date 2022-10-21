@@ -35,5 +35,5 @@ steps:
     step: ripple-set_hooks
     dependsOn: account_info_01
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]
       namespace: ripple-backlist

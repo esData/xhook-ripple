@@ -1,12 +1,12 @@
 ---
 name: ripple-rollback
-type: step
 version: 0.1.0
 summary: rollback/reject a transaction and prepare the WASM
 tags:
-  - rollback
+  - xrpl_hook_rollback
   - wasm
-  - final_src
+  - xrpl_hook_payload
+  - compile_src
 templates:
   ripple-accept:
     main: ripple-main.c.mustache

@@ -1,13 +1,13 @@
 ---
 name: ripple-accept
-type: step
 version: 0.1.0
-summary: commit hook changes with a reason code
-description: Commit a transaction with a reference or reason code. This will generate the WASM output.  
+summary: Commit hook changes with a reason or reference code
+description: This will generate the WASM output with a Hook commit include reference or reason code.
 tags:
-  - accept
+  - xrpl_hook_accept
   - wasm
-  - final_src
+  - xrpl_hook_payload
+  - compile_src
 templates:
   ripple-accept:
     main: ripple-main.c.mustache
@@ -15,6 +15,6 @@ templates:
       - ripple-accept.c.mustache
 parameters:
   reason:
-    description: Reason or references code
+    description: Reference or reason code
     type: string
     default: SUCCESS

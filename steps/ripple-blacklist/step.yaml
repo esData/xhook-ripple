@@ -1,17 +1,13 @@
 ---
 name: ripple-blacklist
-type: step
 version: 0.1.0
 summary: Backlist
 tags:
-  - blacklist
-  - wasm
+  - xrpl_hook_blacklist
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache
     body:
       - ripple-blacklist.c.mustache
-parameters:
-  emitted_account:
-    description: Target emitted account
-    type: string
+parameters: {}

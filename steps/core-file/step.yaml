@@ -1,0 +1,14 @@
+---
+name: core-file
+version: 0.1.0
+summary: File step to retreive or save file contents
+description: A simple file step that will retreive and save a file content when there is contents being supplied in to parameters.
+tags:
+  - file
+parameters:
+  file:
+    description: absolute file path
+    type: string
+  contents:
+    description: file contents to be save or retreive if blank
+    default: ''

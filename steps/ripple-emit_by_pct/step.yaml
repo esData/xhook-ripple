@@ -1,11 +1,10 @@
 ---
 name: ripple-emit_by_pct
-type: step
 version: 0.1.0
-summary: Emit a transaction by percentage
+summary: Emit a transaction by origin amounts percentage
 tags:
-  - emit
-  - wasm
+  - xrpl_hook_emit
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache
@@ -16,7 +15,7 @@ parameters:
     description: Target emitted account
     type: string
   origin_txn_drops_pct:
-    description: Percentage of original transaction drops to be emit to emitted account 1 < n < 99
+    description: Percentage of original transaction drops to be emitted range 1 < n < 99
     type: integer
     default: 1
   min_drops_emitted:

@@ -6,60 +6,65 @@ const metadata = stepsHelper.metadata
  * **SUMMARY:** deploy hook to specific account, list up to 4 accounts.
  * 
  * **PARAMETERS:**
- * @param account_seq Account information to obtain the latest sequence number
+ * @param account_sequence Account information to obtain the latest sequence number
  * @param secret Account secret
  */
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
-  if (!step.parameters.wasm) {
-    step.status = 'error';
-    step.message = `[${workflowId} [${stepName}]: No prepared template Or no accept step.`;
+
+  // Validate parameters based on metadata
+  var missing_params = stepsHelper.validate_params(step.parameters);
+  if (missing_params.length > 0) {
+    stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
+    callback(step);
+  } else if (!step.parameters.wasm) {
+    stepsHelper.setError(step, `${workflowId}@${stepName}: No prepared template, ensure accept/rollback step included.`);
+    callback(step);
+  } else {
+    // Enable account debug traces
+    if ( step.parameters.traces_env ) {
+      const accounts = step.parameters.accounts ? step.parameters.accounts : [];
+      if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
+        accounts.push(step.parameters.account);
+      }
+      stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
+    }
+    
+    const zlib = require('zlib');
+    const wasm_bytes = stepsHelper.decodeRestrictedBase64ToBytes(step.parameters.wasm);
+    const wasm_inflat = zlib.inflateSync(wasm_bytes);
+    const xrpljs = require("xrpl-hooks");
+
+    const account = xrpljs.Wallet.fromSeed(step.parameters.secret).classicAddress;
+    const namespace = step.parameters.namespace || stepName;
+
+    var hookon = "0000000000000000";
+    var hook_params = step.parameters.hook_parameters || [];
+    var txn = stepsHelper.prepare_sethook_txn(account,
+                                              namespace,
+                                              wasm_inflat,
+                                              step.parameters.account_sequence,
+                                              hookon,
+                                              hook_params
+                                              );
+
+    try {
+      const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
+      await client.connect();
+      var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
+    
+      delete txn["SigningPubKey"];
+      txn.Fee = response.result?.drops?.base_fee || "10";
+
+      var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(step.parameters.secret) })
+      if ( response.result.applied !== true || response.result.engine_result != 'tesSUCCESS' ) {
+        stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${response.result.engine_result_message}.`);
+      }
+      stepsHelper.setOutputs(step, { 'result' : response.result} );
+      client.disconnect();
+    } catch(e) {
+      stepsHelper.setError(step, `[${workflowId}] [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`);
+    }
     callback(step);
   }
-  // Enable account debug traces
-  if ( step.parameters.traces_env ) {
-    const accounts = step.parameters.accounts ? step.parameters.accounts : [];
-    if ( step.parameters.account && !accounts.includes(step.parameters.account) ) {
-      accounts.push(step.parameters.account);
-    }
-    stepsHelper.traces_on(workflowId, accounts, step.parameters.traces_env);
-  }
-  
-  const zlib = require('zlib');
-  const wasm_bytes = stepsHelper.decodeRestrictedBase64ToBytes(step.parameters.wasm);
-  const wasm_inflat = zlib.inflateSync(wasm_bytes);
-
-  const xrpljs = require("xrpl-hooks");
-  const secret = step.parameters.secret;
-  const account = step.parameters.account || xrpljs.Wallet.fromSeed(secret).classicAddress;
-  const namespace = step.parameters.namespace || stepName;
-  const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
-  await client.connect();
-
-  var hookon = "0000000000000000";
-  var hook_params = step.parameters.hook_parameters || [];
-  var txn = stepsHelper.prepare_sethook_txn(account,
-                                            namespace,
-                                            wasm_inflat,
-                                            step.parameters.account_seq,
-                                            hookon,
-                                            hook_params
-                                            );
-  log.debug(`[${workflowId} [${stepName}]: txn= ${JSON.stringify(txn)}`);
-
-  try {
-    var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
-  
-    delete txn["SigningPubKey"];
-    txn.Fee = response.result?.drops?.base_fee || "10";
-
-    var response = await client.submit(txn, { wallet: xrpljs.Wallet.fromSeed(secret) })
-    stepsHelper.setOutputs(step, { 'result' : response.result} );
-  } catch(e) { 
-    step.status = 'error';
-    step.message = `[${workflowId} [${stepName}]: ${metadata.name}@${metadata.version}, ${e}.`
-  }
-
-  client.disconnect();
-  callback(step);
 };

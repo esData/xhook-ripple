@@ -5,8 +5,43 @@ const crypto = require("crypto");
 
 class stepsHelper {
   constructor(stepdir) {
-    this.metadata = yaml.load(fs.readFileSync(stepdir + "/step.yaml", "utf8"));
-    this.template_path = `${stepdir}/../../templates`;
+    try {
+      this.metadata = yaml.load(fs.readFileSync(stepdir + "/step.yaml", "utf8"));
+      this.template_path = `${stepdir}/../../templates`;
+    } catch (e) {
+      throw new Error(`unable to prepare hook: ${e}`);
+    }
+  }
+
+  toHex(str) {
+    var result = ''
+    for (var i = 0; i < str.length; i++) {
+      result += str.charCodeAt(i).toString(16)
+    }
+    return result.toUpperCase()
+  }
+
+  hexlify_memos(x) {
+    if (!("Memos" in x)) return;
+
+    for (let y = 0; y < x["Memos"].length; ++y) {
+      let Memo = x["Memos"][y]["Memo"];
+      let Fields = ["MemoFormat", "MemoType", "MemoData"];
+      for (let z = 0; z < Fields.length; ++z) {
+        if (Fields[z] in Memo) {
+          let u = Memo[Fields[z]].toUpperCase()
+          if (u.match(/^[0-9A-F]+$/)) {
+            Memo[Fields[z]] = u;
+            continue;
+          }
+          let v = Memo[Fields[z]], q = "";
+          for (let i = 0; i < v.length; ++i) {
+            q += Number(v.charCodeAt(i)).toString(16).padStart(2, '0');
+          }
+          Memo[Fields[z]] = q.toUpperCase();
+        }
+      }
+    }
   }
 
   arrayBufferToHex(arrayBuffer) {
@@ -218,21 +253,41 @@ class stepsHelper {
     };
   }
 
-  prepare_sethook_txn(account, stepname, wasm, sequence) {
+  prepare_sethook_txn(account, stepname, wasm, sequence, hookon = "0000000000000000", hook_params = []) {
+    var hooks = [];
+    if (wasm == '') {
+      // if no WASM pass here, will rmeove the hook
+      hooks.push( { Hook: {
+                      CreateCode: '',
+                      Flags: 1,
+                  }});
+    } else {
+      var hook =  {
+                    CreateCode: this.arrayBufferToHex(wasm).toUpperCase(),
+                    HookApiVersion: 0,
+                    HookNamespace: crypto.createHash('sha256').update(stepname).digest('hex').toUpperCase(),
+                    HookOn: hookon,
+                    Flags: 1, // 1-Override, 2-NSDelete, 4-Collect 
+                  };
+      if ( hook_params.length > 0 ) {
+        const filteredHookParameters = hook_params.filter(
+          hp => hp.HookParameter.HookParameterName && hp.HookParameter.HookParameterValue
+        )?.map(aa => ({
+          HookParameter: {
+            HookParameterName: this.toHex(aa.HookParameter.HookParameterName || ''),
+            HookParameterValue: aa.HookParameter.HookParameterValue || ''
+          }
+        }))
+        hook['HookParameters'] = filteredHookParameters;
+      }
+      // TODO: cater more than 1 hooks
+      hooks.push({ Hook: hook });
+    }
+
     return {
       Account: account,
       TransactionType: "SetHook",
-      Hooks: [
-        {
-          Hook: {
-            CreateCode: this.arrayBufferToHex(wasm).toUpperCase(),
-            HookApiVersion: 0,
-            HookNamespace: crypto.createHash('sha256').update(stepname).digest('hex').toUpperCase(),
-            HookOn: "0000000000000000",
-            Flags: 1,
-          },
-        },
-      ],
+      Hooks: hooks,
       SigningPubKey: '',
       Sequence: sequence,
       Fee: "0" 
@@ -252,8 +307,71 @@ class stepsHelper {
     return step;
   }
 
+  setWasm(step, data) {
+    step.wasm = data;
+  }
+  
+  getWabt(data) {
+      // Decode base64 encoded wasm that is coming back from the endpoint
+      const {readWasm} = require('wabt');
+      return readWasm(new Uint8Array(decodeBinary(data)));
+  }
+
   setOutputs(step, output) {
     step['outputs'] = output;
+  }
+
+  setError(step, message) {
+    step.status = 'error';
+    step.message = message;
+  }
+
+  getOutputs(step) {
+    return step['outputs'];
+  }
+
+  traces_on(workflowId, accounts = [], environment = 'hooks-testnet-v2-debugstream.xrpl-labs.com' ) {
+    const WebSocketClient = require('websocket').client;
+    var connections = [];
+
+    accounts.map( function(account) {
+      var client = new WebSocketClient();
+      var writableStream = fs.createWriteStream(`${process.env.REPORTS_PATH}/${workflowId}_${account}.log`);
+  
+      client.on('connectFailed', function(error) {
+        // do nothing
+      });
+  
+      client.on('connect', function(connection) {  
+        connection.on('message', function(raw_data) {
+          if (raw_data.type === 'utf8') {
+            try {
+              writableStream.write(`\n` + raw_data.utf8Data);
+            } catch (e) {
+              // do nothing
+            }
+          }
+        });
+      });
+  
+      client.connect(`wss://${environment}\\${account}`, 'echo-protocol');
+      connections.push(client);
+    });
+  }
+
+  validate_params(parameters) {
+    var metadata = this.metadata;
+    var missing = [];
+    Object.keys(metadata['parameters'] || {}).forEach( function(key) {
+      if (!parameters[key] && metadata.parameters[key].optional != true ) {
+        if (metadata.parameters[key].default) {
+          parameters[key] = metadata.parameters[key].default;
+        } else {
+          missing.push(key);
+        }
+      }
+    });
+    return missing;
   }
 }
 

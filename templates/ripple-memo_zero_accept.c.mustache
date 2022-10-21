@@ -1,0 +1,8 @@
+  // check for the presence of a memo
+  uint8_t memos[2048];
+  int64_t memos_len = otxn_field(SBUF(memos), sfMemos);
+
+  uint32_t payload_len = 0, signature_len = 0, publickey_len = 0;
+  uint8_t* payload_ptr = 0, *signature_ptr = 0, *publickey_ptr = 0;
+  if (memos_len <= 0)
+    accept(SBUF("{{reason}}"), 0);

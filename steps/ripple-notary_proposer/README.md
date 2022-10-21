@@ -1,0 +1,3 @@
+# ripple-notary
+
+This step will prepare the notary propose transaction. WIP...

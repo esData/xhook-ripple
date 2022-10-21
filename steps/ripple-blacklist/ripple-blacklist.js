@@ -5,13 +5,18 @@ const stepsHelper = new shelper(__dirname);
  * **SUMMARY:** Emit a transaction by percentage
  * 
  * **PARAMETERS:**
- * @param emitted_account Target emitted account
- * @param origin_txn_drops_pct Percentage of original transaction drops to be emit to emitted account 1 < n < 99
- * @param min_drops_emitted Mininum/default emit drops
+ * @param WIP
  * **OUTPUT:**
  * @param src A generate source snippet.
  */
 
 module.exports = function (workflowId, stepName, step, log, callback) {
-  callback( stepsHelper.setSource( step,stepsHelper.prepare_template(stepName, step, true) ));
+  // Validate parameters based on metadata
+  var missing_params = stepsHelper.validate_params(step.parameters);
+  if (missing_params.length > 0) {
+    stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
+    callback(step);
+  } else {
+    callback( stepsHelper.setSource( step,stepsHelper.prepare_template(stepName, step, true) ));
+  }
 };

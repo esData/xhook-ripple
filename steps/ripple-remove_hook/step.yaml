@@ -1,14 +1,20 @@
 ---
 name: ripple-remove_hook
-type: step
 version: 0.1.0
 summary: simple remove all the hooks on a account
 description: This step will simple remove hooks on a accounts
 tags:
-  - remove_hook
-  - fee
+  - xrpl_remove_hook
 parameters:
-  account_seq:
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
+  account_sequence:
     description: Account sequence
     type: integer
     dependsOnStep: ripple-account_info
@@ -16,9 +22,3 @@ parameters:
   secret:
     description: Account secret
     type: secret
-    default: $[parameteres.secret]
-  account:
-    description: Account address
-    type: string
-    default: $[parameteres.account]
-    optional: true

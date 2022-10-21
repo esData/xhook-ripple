@@ -1,25 +1,12 @@
 ---
 name: ripple-notary
-type: step
-version: 0.1.0
-summary: Emit a transaction by percentage
+summary: Prepare a notary service
 tags:
-  - notary
-  - wasm
+  - xrpl_hook_notary
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache
     body:
       - ripple-notary.c.mustache
-parameters:
-  emitted_account:
-    description: Target emitted account
-    type: string
-  origin_txn_drops_pct:
-    description: Percentage of original transaction drops to be emit to emitted account 1 < n < 99
-    type: integer
-    default: 1
-  min_drops_emitted:
-    description: Mininum/default emit drops
-    type: integer
-    default: 1000
+parameters: {}

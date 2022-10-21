@@ -1,17 +1,19 @@
 ---
 name: ripple-memo_zero_accept
-type: step
 version: 0.1.0
 summary: Memo if not found do nothing
 tags:
-  - memo
-  - wasm
+  - xrpl_hook_account_objects
+  - xrpl_memo
+  - xrpl_hook_accept
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache
     body:
       - ripple-memo_zero_accept.c.mustache
 parameters:
-  message:
-    description: Memo not found message
+  reason:
+    description: Reference or reason code
     type: string
+    default: CONT_WITHOUT_MEMO

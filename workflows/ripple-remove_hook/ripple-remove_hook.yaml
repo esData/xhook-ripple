@@ -14,7 +14,6 @@ publish: public
 parameters:
   environment: hooks-testnet-v2.xrpl-labs.com
   # traces_env: hooks-testnet-v2-debugstream.xrpl-labs.com
-  account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
   secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
 
 steps:
@@ -28,4 +27,4 @@ steps:
     dependsOn: account_objects_01
     skip: ?[$[steps.account_objects_01.outputs] == empty]
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]

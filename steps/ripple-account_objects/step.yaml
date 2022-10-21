@@ -1,16 +1,29 @@
 ---
 name: ripple-account_objects
-type: step
 version: 0.1.0
-summary: get account information for decision
-description: Simple step to retrive account information for workflow parameters
+summary: Get account objects information
+description: Simple step to retrive XRPL account objects information
 tags:
   - account_objects
+  - xrpl_command
 parameters:
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
   account:
-    description: account id and secrets retreived from the vaults
-    type: array[string]
+    description: Account address to collect information from.
+    type: string
+    optional: true
+  secret:
+    description: Account secret, vault parameters.
+    type: string
+    optional: true
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
 outputs:
-  result:
-    description: retreive account information
+  account_object:
+    description: Current account objects
     type: json 

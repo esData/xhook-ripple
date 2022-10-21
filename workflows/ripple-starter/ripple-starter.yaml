@@ -50,7 +50,7 @@ steps:
     dependsOn: account_info_01
     # status: disabled
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]
       hook_parameters:
         - HookParameter:
             HookParameterName: "key1"

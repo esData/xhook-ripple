@@ -1,0 +1,8 @@
+  // STEP: {{stepName}}@{{step}}
+  uint8_t {{param_field}}[33];
+  int64_t prv = hook_param(SBUF({{param_field}}), (uint32_t)"{{param_name}}", SBUF({{param_name}}));
+  if (prv != sizeof({{param_field}}))
+  {
+      TRACEVAR(prv);
+      rollback(SBUF("{{stepName}}@{{step}}: \"{{param_name}}\" parameter missing"), 56);
+  }

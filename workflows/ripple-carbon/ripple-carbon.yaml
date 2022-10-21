@@ -45,4 +45,4 @@ steps:
     dependsOn: account_info_01
     skip: $[parameters.skip_set_hook]
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]

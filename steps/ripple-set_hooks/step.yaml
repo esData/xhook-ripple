@@ -1,32 +1,28 @@
 ---
 name: ripple-set_hooks
-type: step
 version: 0.1.0
-summary: deploy hook to specific account, list up to 4 accounts.
-description: deploy hook to specific account, list up to 4 accounts.
+summary: Deploy hook to specific account.
+description: This step deploy hook to a account, by default currently with setup one hook at a time, up to 4 hook-chain.
 tags:
-  - set_hook
-  - fee
+  - xrpl_set_hook
 parameters:
-  account_seq:
-    description: Account sequence.
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
+  account_sequence:
+    description: Account sequence
     type: integer
-    dependsOnStep: ripple-address_info
+    dependsOnStep: ripple-account_info
     dependsOnStepOutputs: Sequence
   secret:
     description: Account secret
     type: secret
-    default: $[parameteres.secret]
-  account:
-    description: Account address
-    type: string
-    default: $[parameteres.account]
-    optional: true
   hook_parameters:
     description: Hook parameters to be setup. field must contain HookParameter, HookParameterName and HookParameterValue.
-    type: array[json]
+    type: json
     optional: true
-    # example
-    #    - HookParameter:
-    #        HookParameterName: "key1"
-    #        HookParameterValue: "1234523445"

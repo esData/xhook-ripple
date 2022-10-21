@@ -16,7 +16,7 @@ steps:
     step: ripple-pay
     dependsOn: account_info_01
     parameters:
-      account_seq: $[steps.account_info_01.outputs.Sequence]
+      account_sequence: $[steps.account_info_01.outputs.Sequence]
       destination: rQ9sex1wMJVmiHD757xA1Ja92XGyVygjzB
       amount: 1
       invoice_id: B3C0019B4FFE224A297F275F7AC927B1AF5F56950E56252CDE12468F381C6266

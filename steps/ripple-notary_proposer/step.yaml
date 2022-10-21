@@ -1,29 +1,31 @@
 ---
-name: ripple-pay
-type: step
+name: ripple-notary_proposer
 version: 0.1.0
-summary: Make ripple payment
-description: Generate ripple payment transaction
+summary: Prepare a notary service proposer but submit a transaction.
+description: Step to prepare a notary service proposer
 tags:
-  - payment
-  - fee
+  - xrpl_payment
+  - xrpl_hook_notary_proposer
 parameters:
-  account_seq:
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
+  account_sequence:
     description: Account sequence
     type: integer
-    dependsOnStep: ripple-address_info
+    dependsOnStep: ripple-account_info
     dependsOnStepOutputs: Sequence
   secret:
     description: Account secret
     type: secret
     default: $[parameteres.secret]
-  account:
-    description: Account address
-    type: string
-    default: $[parameteres.account]
-    optional: true
-  destination:
-    description: Target payment account
+  notary_account:
+    description: Notary account
     type: string
   destination_tag:
     description: Target payment destination tag
@@ -44,6 +46,7 @@ parameters:
   amount:
     description: Payment amount 
     type: float
+    default: 1
   paths:
     description: Payment paths 
     type: string
@@ -52,3 +55,4 @@ parameters:
     description: mock Payment
     type: boolean
     default: false
+    optional: true

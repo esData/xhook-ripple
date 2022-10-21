@@ -1,0 +1,20 @@
+---
+name: internal-load_acct_dbg_logs
+summary: Load account debug logs
+description: Load account debug logs
+uri: https://github.com/esDataCo/tree/master/co-test
+publish: private
+
+triggers:
+  daily_run:
+    scheduled: true
+    trigger: system-cron
+    parameters:
+      schedule: '* 1 * * *'
+
+parameters:
+  environment: hooks-testnet-v2.xrpl-labs.com
+
+steps:
+  account_info_01:
+    step: internal-acctrc_to_db

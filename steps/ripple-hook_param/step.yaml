@@ -1,20 +1,19 @@
 ---
 name: ripple-hook_param
-type: step
 version: 0.1.0
 summary: Hook param implementation
 tags:
-  - hook_param
-  - wasm
+  - xrpl_hook_param
+  - src
 templates:
   ripple-trace:
     main: ripple-main.c.mustache
     body:
       - ripple-hook_param.c.mustache
 parameters:
-  param_field:
-    description: Source param field
-    type: string
   param_name:
-    description: Parameter name
+    description: Hook param name, to be applied under Step Hook or Hook WASM payload deploy
+    type: string
+  param_field:
+    description: Source level parameter name, ensure the parameter name was consistant across source.
     type: string

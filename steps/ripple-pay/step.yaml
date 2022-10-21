@@ -1,27 +1,28 @@
 ---
 name: ripple-pay
-type: step
 version: 0.1.0
-summary: Make ripple payment
-description: Generate ripple payment transaction
+summary: Make Ripple transaction
+description: Generate Ripple transaction with optional parameters.
 tags:
-  - payment
-  - fee
+  - xrpl_payment
 parameters:
-  account_seq:
+  environment:
+    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    type: string
+    default: hooks-testnet-v2.xrpl-labs.com
+  traces_env:
+    description: Account debug traces environments, specify this value to enable account debug traces.
+    type: string
+    optional: true
+  account_sequence:
     description: Account sequence
     type: integer
-    dependsOnStep: ripple-address_info
+    dependsOnStep: ripple-account_info
     dependsOnStepOutputs: Sequence
   secret:
     description: Account secret
     type: secret
     default: $[parameteres.secret]
-  account:
-    description: Account address
-    type: string
-    default: $[parameteres.account]
-    optional: true
   destination:
     description: Target payment account
     type: string
@@ -52,3 +53,4 @@ parameters:
     description: mock Payment
     type: boolean
     default: false
+    optional: true

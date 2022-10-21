@@ -23,5 +23,5 @@ steps:
     step: ripple-notary_proposer
     dependsOn: account_info_01
     parameters:
-      account_seq: "$[steps.account_info_01.outputs.Sequence]"
+      account_sequence: "$[steps.account_info_01.outputs.Sequence]"
       proposed_amount: 990000
