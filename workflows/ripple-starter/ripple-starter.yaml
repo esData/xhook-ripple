@@ -13,7 +13,7 @@ publish: public
 
 triggers:
   daily_run:
-    scheduled: true
+    scheduled: false
     trigger: system-cron
     parameters:
       schedule: '0 * * * *'
@@ -27,7 +27,6 @@ triggers:
 parameters:
   environment: hooks-testnet-v2.xrpl-labs.com
   account: rGjtrRRicdDhv8DGXNmr1TJhiDxSe6392K
-  secret: ssBbXQNpTzQ7gPPAFAN4HE7Zn3vPz
   reason: "Starter: completed"
 
 steps:
@@ -45,13 +44,36 @@ steps:
     dependsOn: accept-01
     parameters:
       account: "$[parameters.account]"
+  vault_kv_get_01:
+    step: hashicorp-vault_kv_get
+    dependsOn: account_info_01
+    parameters:
+      token: 'hvs.5iq6HaGCHTPSpYqJz2HQFFbE'
+      path: secret/data/users/cheehuan@esdata.co/accounts/$[parameters.account]
   set_hook_test01:
     step: ripple-set_hooks
-    dependsOn: account_info_01
+    dependsOn: vault_kv_get_01
     # status: disabled
     parameters:
       account_sequence: $[steps.account_info_01.outputs.Sequence]
+      secret: $[steps.vault_kv_get_01.outputs.secret]
+      hook_namespace: "$[name]"
       hook_parameters:
         - HookParameter:
             HookParameterName: "key1"
             HookParameterValue: "1234523445"
+  message_01:
+    step: slack-message
+    dependsOn: set_hook_test01
+    skip: ?[$[steps.set_hook_test01.status] != completed]
+    parameters:
+      text: Account ($[parameters.account]) hook deployed successfully with namespace $[steps.set_hook_test01.parameters.hook_namespace].
+  message_02:
+    step: system-email
+    dependsOn: message_01
+    skip: ?[$[steps.set_hook_test01.status] != completed]
+    parameters:
+      recipient: cheehuan@esdata.co
+      subject: XRPL Set Hook activitities
+      text_body: $[parameters.account], hook deployed successfully with namespace $[steps.set_hook_test01.parameters.hook_namespace]
+      html_body: <h1>$[parameters.account], hook deployed successfully with namespace $[steps.set_hook_test01.parameters.hook_namespace]</h1>

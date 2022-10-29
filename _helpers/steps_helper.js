@@ -4,6 +4,14 @@ const mustache = require("mustache");
 const crypto = require("crypto");
 const xrpljs = require("xrpl-hooks");
 
+/* steps_helper
+ * **SUMMARY:** Xhook steps helper class
+ * **VERSION:** 0.1.0
+ * 
+ * **PARAMETERS:**
+ * @param 
+ */
+
 class stepsHelper {
   constructor(stepdir) {
     try {

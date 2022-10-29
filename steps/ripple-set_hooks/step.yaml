@@ -22,6 +22,10 @@ parameters:
   secret:
     description: Account secret
     type: secret
+  hook_namespace:
+    description: Hook namespace
+    type: string
+    optional: true  
   hook_parameters:
     description: Hook parameters to be setup. field must contain HookParameter, HookParameterName and HookParameterValue.
     type: json
