@@ -1,4 +1,4 @@
-# ripple-xrpspec    
+# ripple-xrpspec
 
 make the test scenario and test cases predictable, simpler and more efficient in any test phases.
 

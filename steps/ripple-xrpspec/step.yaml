@@ -1,11 +1,12 @@
 ---
-name: ripple-trace
+name: ripple-xrpspec
 version: 0.1.0
-summary: add a trace message
+summary: XRP test spec implementation
 description: A step to add  trace in a hook
 tags:
-  - xrpl_hook_trace
-  - src
+  - xrpl_hook
+  - xrpspec
+  - test
 parameters:
   assertion:
     description: assertion type
