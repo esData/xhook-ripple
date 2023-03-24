@@ -2,7 +2,7 @@
 name: ripple-xrpspec
 version: 0.1.0
 summary: XRP test spec implementation
-description: A step to add  trace in a hook
+description: XRP test spec implementation
 tags:
   - xrpl_hook
   - xrpspec
