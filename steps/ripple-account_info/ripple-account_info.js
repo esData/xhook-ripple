@@ -20,7 +20,9 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
     stepsHelper.setError(step, `${workflowId}@${stepName}: missing parameters ${missing_params}.`);
   } else {
     // Derive from secret, if account not specified
-    const account = step.parameters.secret ? stepsHelper.validate_secret_account(step.parameters.secret) : step.parameters.account;
+    const account = step.parameters.account ? step.parameters.account : 
+                    (step.parameters.secret ? stepsHelper.validate_secret_account(step.parameters.secret) : step.parameters.account);
+    // const account = step.parameters.secret ? stepsHelper.validate_secret_account(step.parameters.secret) : step.parameters.account;
     if ( !account ) {
       stepsHelper.setError(step, `${workflowId}@${stepName}: missing account or invliad secret.`);
     } else {

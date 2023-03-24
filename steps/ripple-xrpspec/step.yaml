@@ -1,0 +1,23 @@
+---
+name: ripple-trace
+version: 0.1.0
+summary: add a trace message
+description: A step to add  trace in a hook
+tags:
+  - xrpl_hook_trace
+  - src
+parameters:
+  assertion:
+    description: assertion type
+    type: string
+  object:
+    description: object to be tested
+    type: string
+  value:
+    description: expected value
+    type: string
+    optional: true
+outputs:
+  result:
+    description: Test result
+    type: bool 
