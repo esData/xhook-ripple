@@ -1,0 +1,24 @@
+---
+name: ripple-xrpspec
+version: 0.1.0
+summary: XRP test spec implementation
+description: XRP test spec implementation
+tags:
+  - xrpl_hook
+  - xrpspec
+  - test
+parameters:
+  assertion:
+    description: assertion type
+    type: string
+  object:
+    description: object to be tested
+    type: string
+  value:
+    description: expected value
+    type: string
+    optional: true
+outputs:
+  result:
+    description: Test result
+    type: bool 
