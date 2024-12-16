@@ -11,7 +11,7 @@ const metadata = stepsHelper.metadata
  */
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
-  const xrpljs = require("xrpl-hooks");
+  const xrpljs = require("@transia/xrpl");
 
   // Validate parameters based on metadata
   var missing_params = stepsHelper.validate_params(step.parameters);

@@ -2,6 +2,7 @@
 name: ripple-blacklist
 version: 0.1.0
 summary: Backlist
+description: A step to enable balcklist
 tags:
   - xrpl_hook_blacklist
   - src

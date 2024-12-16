@@ -2,6 +2,7 @@
 name: ripple-firewall
 version: 0.1.0
 summary: Firewall
+description: A step tp prepare firewall implementation
 tags:
   - xrpl_hook_firewall
   - src

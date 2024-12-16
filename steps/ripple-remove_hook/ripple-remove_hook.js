@@ -11,7 +11,7 @@ const metadata = stepsHelper.metadata
  */
 
 module.exports = async function (workflowId, stepName, step, log, callback) {
-  const xrpljs = require("xrpl-hooks");
+  const xrpljs = require("@transia/xrpl");
 
   // Validate parameters based on metadata
   var missing_params = stepsHelper.validate_params(step.parameters);
@@ -36,8 +36,8 @@ module.exports = async function (workflowId, stepName, step, log, callback) {
       try {
         const client = new xrpljs.Client(`wss://${step.parameters.environment}`);
         await client.connect();
-
         var response = await client.request(stepsHelper.prepare_fee_txn(xrpljs.encode(txn)));
+
         delete txn["SigningPubKey"];
         txn.Fee = response.result?.drops?.base_fee || "10";
 

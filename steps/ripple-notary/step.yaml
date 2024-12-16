@@ -1,6 +1,8 @@
 ---
 name: ripple-notary
+version: 0.1.0
 summary: Prepare a notary service
+description: A step to prepare a notary service account
 tags:
   - xrpl_hook_notary
   - src

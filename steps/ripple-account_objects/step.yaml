@@ -1,6 +1,6 @@
 ---
 name: ripple-account_objects
-version: 0.1.0
+version: 0.1.1
 summary: Get account objects information
 description: Simple step to retrive XRPL account objects information
 tags:
@@ -8,9 +8,9 @@ tags:
   - xrpl_command
 parameters:
   environment:
-    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    description: XRPL environment.
     type: string
-    default: hooks-testnet-v2.xrpl-labs.com
+    default: hooks-testnet-v3.xrpl-labs.com
   account:
     description: Account address to collect information from.
     type: string
@@ -24,6 +24,6 @@ parameters:
     type: string
     optional: true
 outputs:
-  account_object:
+  account_objects:
     description: Current account objects
-    type: json 
+    type: json

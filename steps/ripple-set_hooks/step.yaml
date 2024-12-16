@@ -1,6 +1,6 @@
 ---
 name: ripple-set_hooks
-version: 0.1.0
+version: 0.1.1
 summary: Deploy hook to specific account.
 description: This step deploy hook to a account, by default currently with setup one hook at a time, up to 4 hook-chain.
 tags:
@@ -14,14 +14,15 @@ parameters:
     description: Account debug traces environments, specify this value to enable account debug traces.
     type: string
     optional: true
+  secret:
+    description: Account secret
+    type: secret
+    optional: true
   account_sequence:
     description: Account sequence
     type: integer
     dependsOnStep: ripple-account_info
     dependsOnStepOutputs: Sequence
-  secret:
-    description: Account secret
-    type: secret
   hook_namespace:
     description: Hook namespace
     type: string

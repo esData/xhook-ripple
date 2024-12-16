@@ -1,0 +1,25 @@
+# Use test_params.yml for unit test step.
+# params specified here will override the values provided by workflow test_params.yaml.
+---
+environment: hooks-testnet-v3.xrpl-labs.com
+accounts:
+  - test1
+  - test2
+secret: snyJzeqYshamkRKrgAqkEu5r84w3b
+traces_env: true
+
+# TDD - steps
+steps:
+  valid_account:
+    step: ripple-account_info
+    description: inspect account info
+    result: completed
+  invalid_account:
+    secret: invalid_account
+    step: ripple-account_info
+  loop_test:
+    step: loop
+    description: loop test
+    loop: $[accounts]
+    steps: ripple-account_info
+

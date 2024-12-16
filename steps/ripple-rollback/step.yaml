@@ -2,6 +2,7 @@
 name: ripple-rollback
 version: 0.1.0
 summary: rollback/reject a transaction and prepare the WASM
+description: A step to rollback/reject a transaction and prepare the WASM
 tags:
   - xrpl_hook_rollback
   - wasm

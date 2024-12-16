@@ -2,6 +2,7 @@
 name: ripple-emit_by_pct
 version: 0.1.0
 summary: Emit a transaction by origin amounts percentage
+description: A steo to prepare a certain percentage to a another account
 tags:
   - xrpl_hook_emit
   - src

@@ -1,0 +1,16 @@
+name: bind_account
+version: 0.1.0
+summary: continue only transactions was prepare/from hook account.
+description: bind_account
+tags:
+  - xrpl_hook_accept
+  - src
+templates:
+  main: main.c.mustache
+  body:
+    - bind_account.c.mustache
+parameters:
+  reason:
+    description: Reason or references code
+    type: string
+    default: SUCCESS

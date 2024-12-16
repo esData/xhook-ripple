@@ -15,11 +15,7 @@ module.exports = function (workflowId, stepName, step, log, callback) {
   // Validate parameters based on metadata
   var missing_params = stepsHelper.validate_params(step.parameters);
   if (missing_params.length > 0) {
-    stepsHelper.setError(
-      step,
-      `${workflowId}@${stepName}: missing parameters ${missing_params}.`
-    );
-    callback(step);
+    stepsHelper.setError(step, `missing parameters ${missing_params}.`);
   } else {
     try {
       var assertion = step.parameters.assertion;
@@ -45,22 +41,38 @@ module.exports = function (workflowId, stepName, step, log, callback) {
       ) {
         expect.expect(step.parameters.object)[assertion](step.parameters.value);
         log.info(
-          `❏ xrpSpec: ${stepName}: \x1b[30m\x1b[42mPASS\x1b[0m`
+          `❏ [${workflowId}] s=[${stepName}@ripple-xrpspec]: \x1b[30m\x1b[42mPASS\x1b[0m`
         );
-        stepsHelper.setOutputs(step, true);
+        stepsHelper.setOutputs(step, {
+          stats: { passes: 1, asserts: 1, failures: 0 },
+          asserts: [
+            { ok: true, name: stepName, comment: step.parameters.comment },
+          ],
+        });
       } else {
+        step.ignore = true;
         stepsHelper.setError(
           step,
-          `${workflowId}@${stepName}: Unknown or unsupported expect function [${assertion}]`
+          `[${workflowId}] s=[${stepName}@ripple-xrpspec]: Unknown or unsupported expect function [${assertion}]`
         );
+        stepsHelper.setOutputs(step, {
+          stats: { passes: 0, asserts: 1, failures: 1 },
+          asserts: [
+            { ok: true, name: stepName, comment: step.parameters.comment },
+          ],
+        });
       }
-      stepsHelper.setOutputs(step, true);
     } catch (expectError) {
       step.ignore = true;
       stepsHelper.setError(step, expectError.message);
-      stepsHelper.setOutputs(step, false);
+      stepsHelper.setOutputs(step, {
+        stats: { passes: 0, asserts: 1, failures: 1 },
+        asserts: [
+          { ok: true, name: stepName, comment: step.parameters.comment },
+        ],
+      });
       log.info(
-        `❏ xrpSpec: ${stepName}: \x1b[30m\x1b[41mFAIL\x1b[0m`
+        `❏ [${workflowId}] s=[${stepName}@ripple-xrpspec]: \x1b[30m\x1b[41mFAIL\x1b[0m`
       );
     }
   }

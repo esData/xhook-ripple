@@ -1,15 +1,15 @@
 ---
 name: ripple-pay
-version: 0.1.0
+version: 0.1.3
 summary: Make Ripple transaction
 description: Generate Ripple transaction with optional parameters.
 tags:
   - xrpl_payment
 parameters:
   environment:
-    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    description: XRPL environment
     type: string
-    default: hooks-testnet-v2.xrpl-labs.com
+    default: hooks-testnet-v3.xrpl-labs.com
   traces_env:
     description: Account debug traces environments, specify this value to enable account debug traces.
     type: string
@@ -54,3 +54,102 @@ parameters:
     type: boolean
     default: false
     optional: true
+runtime:
+  dependencies:
+    - xrpl-accountlib@latest
+spec:
+  fixtures: inherited
+  description: >-
+    XXRPspec - simple test case to proof payment hook operate properly with correct fee deduction, point in time check, 
+    note - the test spec uses current payment object and not inspect journal, require the test under control accounts. 
+  cases:
+    default:
+      account_info_01:
+        step: ripple-account_info
+        xspec: ~
+      account_info_02:
+        step: ripple-account_info
+        xspec: ~
+        dependsOn: account_info_01
+        parameters:
+          account: $[parameters.destination]
+      ${step.ripple-pay.step_name}:
+        step: ripple-pay
+      account_info_01_post:
+        step: ripple-account_info
+        xspec: ~
+        dependsOn: ${step.ripple-pay.step_name}
+        delay: 1
+      account_info_02_post:
+        step: ripple-account_info
+        dependsOn: account_info_01_post
+        delay: 1
+        parameters:
+          account: $[parameters.destination]
+        xspec: ~
+      inspect_source_account:
+        step: ripple-xrpspec
+        xspec:
+          comment: compute expected post pay balance
+          amount: >-
+            ?[$[steps.account_info_01.outputs.Balance] -
+            $[steps.pay01.parameters.amount]]
+          amount_include_fee: >-
+            ?[$[steps.cal_source_balance.xspec.amount] -
+            $[steps.pay01.outputs.result.tx_json.Fee]]
+        dependsOn: cal_source_balance
+        parameters:
+          assertion: toEqual
+          comment: expect post pay balance deducted with payment fee
+          object: $[steps.account_info_01_post.outputs.Balance]
+          value: $[steps.cal_source_balance.xspec.amount_include_fee]
+    deep1_include_target_account:
+      account_info_01:
+        step: ripple-account_info
+        xspec: ~
+      account_info_02:
+        step: ripple-account_info
+        xspec: ~
+        dependsOn: account_info_01
+        parameters:
+          account: $[parameters.destination]
+      ${step.ripple-pay.step_name}:
+        step: ripple-pay
+      account_info_01_post:
+        step: ripple-account_info
+        xspec: ~
+        dependsOn: ${step.ripple-pay.step_name}
+        delay: 1
+      account_info_02_post:
+        step: ripple-account_info
+        dependsOn: account_info_01_post
+        delay: 1
+        parameters:
+          account: $[parameters.destination]
+        xspec: ~
+      inspect_source_account:
+        step: ripple-xrpspec
+        xspec:
+          comment: compute expected post pay balance
+          amount: >-
+            ?[$[steps.account_info_01.outputs.Balance] -
+            $[steps.pay01.parameters.amount]]
+          amount_include_fee: >-
+            ?[$[steps.cal_source_balance.xspec.amount] -
+            $[steps.pay01.outputs.result.tx_json.Fee]]
+        dependsOn: cal_source_balance
+        parameters:
+          assertion: toEqual
+          comment: expect post pay balance deducted with payment fee
+          object: $[steps.account_info_01_post.outputs.Balance]
+          value: $[steps.cal_source_balance.xspec.amount_include_fee]
+      xspec_inspect_target_account:
+        step: ripple-xrpspec
+        xspec: ~
+        dependsOn: inspect_source_account
+        parameters:
+          assertion: toEqual
+          object: $[steps.account_info_02_post.outputs.Balance]
+          value: >-
+            ?[$[steps.account_info_02.outputs.Balance] +
+            $[steps.pay01.parameters.amount]]

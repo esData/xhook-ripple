@@ -1,6 +1,6 @@
 ---
 name: ripple-account_info
-version: 0.1.0
+version: 0.1.1
 summary: Get XRPL account information
 description: Simple step to retrive account information
 tags:
@@ -8,9 +8,9 @@ tags:
   - xrpl_command
 parameters:
   environment:
-    description: XRPL environment, default to hooks-testnet-v2.xrpl-labs.com if not specified in workflow.
+    description: XRPL environment.
     type: string
-    default: hooks-testnet-v2.xrpl-labs.com
+    default: hooks-testnet-v3.xrpl-labs.com
   account:
     description: Account address to collect information from.
     type: string
@@ -26,16 +26,16 @@ parameters:
 outputs:
   Balance:
     description: Current account Balance
-    type: string 
+    type: string
   Sequence:
     description: Account txn sequence
-    type: string 
+    type: string
   OwnerCount:
     description: Account owner count
-    type: string 
+    type: string
   PreviousTxnLgrSeq:
     description: Previous transaction sequence
-    type: string 
+    type: string
   LedgerEntryType:
     description: Account ledger entry type
-    type: string 
+    type: string

@@ -2,6 +2,7 @@
 name: ripple-trace
 version: 0.1.0
 summary: add a trace message
+description: A step to add  trace in a hook
 tags:
   - xrpl_hook_trace
   - src

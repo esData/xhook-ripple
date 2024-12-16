@@ -2,6 +2,7 @@
 name: ripple-hook_param
 version: 0.1.0
 summary: Hook param implementation
+description: A step introduce hook parameters
 tags:
   - xrpl_hook_param
   - src

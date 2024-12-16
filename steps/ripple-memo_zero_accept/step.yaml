@@ -2,6 +2,7 @@
 name: ripple-memo_zero_accept
 version: 0.1.0
 summary: Memo if not found do nothing
+description: This step will prepare the hook to continue with origin transaction if no memo found
 tags:
   - xrpl_hook_account_objects
   - xrpl_memo
